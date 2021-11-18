@@ -92,6 +92,91 @@ class RegisterDepartment:
         self.dep_name_entry.insert(0, b)
 
 
+class ViewDepartment:
+    data = []
+
+    def __init__(self, w):
+        self.w = w
+        self.w.geometry("1050x600+150+50")
+        self.w.title("View Department")
+        self.w.configure(bg="blue")
+        self.db = Backend.database.Database()
+
+        self.heading = Label(self.w, text="VIEWING ALL DEPARTMENT", font=("Arial 25 bold"), bg="blue", fg="white")
+        self.heading.place(x=240, y=10)
+
+        self.search_label = Label(self.w, text="SEARCH", font=("Arial 15 bold"), bg="blue", fg="white")
+        self.search_label.place(x=100, y=70)
+
+        self.search_entry = Entry(self.w, font=("Arial 10 bold"))
+        self.search_entry.place(x=200, y=75, width=200)
+
+        self.search_btn = Button(self.w, text="SEARCH", font="Arial 8 bold", bg="blue", fg="white",
+                                 cursor="hand2", relief=GROOVE, bd=5, activebackground="white",
+                                 command=self.searching)
+        self.search_btn.place(x=430, y=70)
+
+        self.sort_label = Label(self.w, text="SORT", font=("Arial 15 bold"), bg="blue", fg="white")
+        self.sort_label.place(x=530, y=70)
+
+        self.sort = ttk.Combobox(self.w, state="readonly")
+        self.sort['values'] = ['By Code']
+        self.sort.current(0)
+        self.sort.place(x=600, y=75)
+
+        self.sort_t = ttk.Combobox(self.w, state="readonly")
+        self.sort_t['values'] = ['Increasing', "Decreasing"]
+        self.sort_t.current(0)
+        self.sort_t.bind('<<ComboboxSelected>>',self.sorting)
+        self.sort_t.place(x=750, y=75, width=200)
+
+        self.view_btn = Button(self.w, text="VIEW ALL", font=("Arial 8 bold"), bg="blue", fg="white",
+                               cursor="hand2", relief=GROOVE, bd=5, activebackground="white",
+                               command=self.viewall)
+        self.view_btn.place(x=960, y=70)
+
+        self.update_btn = Button(self.w, text="UPDATE", font=("Arial 10 bold"), bg="blue", fg="white",
+                                 cursor="hand2", relief=GROOVE, bd=5, activebackground="white",
+                                 command=self.update)
+        self.update_btn.place(x=360, y=530, width=100)
+
+        self.delete_btn = Button(self.w, text="DELETE", font=("Arial 10 bold"), bg="blue", fg="white",
+                                 cursor="ha"
+                                        "nd2", relief=GROOVE, bd=5, activebackground="white", command=self.delete)
+        self.delete_btn.place(x=490, y=530, width=100)
+
+        self.back_btn = Button(self.w, text="BACK", font=("Arial 10 bold"), bg="blue", fg="white",
+                               cursor="ha"
+                                      "nd2", relief=GROOVE, bd=5, activebackground="white", command=self.back)
+        self.back_btn.place(x=620, y=530, width=100)
+
+        # ==================TreeView Frame=================
+        self.table_frame = Frame(self.w, bd=4, relief=RIDGE, bg="white")
+        self.table_frame.place(x=10, y=120, width=1030, height=400)
+
+        scroll_x = Scrollbar(self.table_frame, orient=HORIZONTAL)
+        scroll_y = Scrollbar(self.table_frame, orient=VERTICAL)
+        self.dep_tree = ttk.Treeview(self.table_frame,
+                                     columns=(
+                                         "DEPARTMENT ID", "DEPARTMENT CODE", "DEPARTMENT NAME"),
+                                     xscrollcommand=scroll_x.set, yscrollcommand=scroll_y.set)
+        scroll_x.pack(side=BOTTOM, fill=X)
+        scroll_y.pack(side=RIGHT, fill=Y)
+        scroll_x.config(command=self.dep_tree.xview)
+        scroll_y.config(command=self.dep_tree.yview)
+
+        # ==========================TreeView Heading====================
+        self.dep_tree.heading("DEPARTMENT ID", text="DEPARTMENT ID")
+        self.dep_tree.heading("DEPARTMENT CODE", text="DEPARTMENT CODE")
+        self.dep_tree.heading("DEPARTMENT NAME", text="DEPARTMENT NAME")
+        self.dep_tree["show"] = "headings"
+
+        # ==========================TreeView Column====================
+        self.dep_tree.column("DEPARTMENT ID", width=50)
+        self.dep_tree.column("DEPARTMENT CODE", width=150)
+        self.dep_tree.column("DEPARTMENT NAME", width=150)
+        self.dep_tree.pack(fill=BOTH, expand=1)
+        self.viewall()
 
 
 
