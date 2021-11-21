@@ -178,6 +178,123 @@ class ViewDepartment:
         self.dep_tree.pack(fill=BOTH, expand=1)
         self.viewall()
 
+    def viewall(self):
+        try:
+            query = "select * from department"
+            rows = self.db.select(query)
+            self.dep_tree.delete(*self.dep_tree.get_children())
+            for i in rows:
+                self.dep_tree.insert('', END, values=i)
+
+        except:
+            pass
+
+    def update(self):
+        val = self.dep_tree.focus()
+        val_items = self.dep_tree.item(val)
+        values = val_items['values']
+        ViewDepartment.data.clear()
+        ViewDepartment.data.append(values)
+
+        w = Tk()
+        UpdateDepartment(w)
+        self.w.withdraw()
+
+    def searching(self):
+        ent = self.search_entry.get()
+        if ent != "":
+            try:
+                lis = []
+                for i in self.dep_tree.get_children():
+                    a = self.dep_tree.item(i)['values'][0]
+                    lis.append(a)
+                print(f"list = {lis}")
+                search = self.linearsearch(lis, int(self.search_entry.get()))
+                print(f"search = {search}")
+                if search:
+                    messagebox.showinfo("Success", "Found")
+                    query = "select * from department where id = %s"
+                    values = (search,)
+                    a = self.db.select1(query, values)
+                    self.dep_tree.delete(*self.dep_tree.get_children())
+                    for i in a:
+                        self.dep_tree.insert('', END, values=i)
+
+                else:
+                    messagebox.showerror("failed", "Error, Not found")
+
+            except:
+                messagebox.showerror("Not Found", "Error, Not found")
+
+    def sorting(self,events):
+        if self.sort.get() == "By Code" and self.sort_t.get() == "Increasing":
+            query = "select * from department;"
+            data = self.db.select(query)
+            sort_val = []
+            for values in data:
+                sort_val.append(values)
+            sorted_val = self.b_sort_a(sort_val)
+            if len(sorted_val) != 0:
+                messagebox.showinfo("Done","Sorted increasing order")
+                self.dep_tree.delete(*self.dep_tree.get_children())
+                for i in sorted_val:
+                    self.dep_tree.insert('', END, values=i)
+
+        elif self.sort.get() == "By Code" and self.sort_t.get() == "Decreasing":
+            query = "select * from department;"
+            data = self.db.select(query)
+            sort_val = []
+            for values in data:
+                sort_val.append(values)
+            sorted_val = self.b_sort_d(sort_val)
+            if len(sorted_val) != 0:
+                messagebox.showinfo("Done","Sorted Decreasing order")
+                self.dep_tree.delete(*self.dep_tree.get_children())
+                for i in sorted_val:
+                    self.dep_tree.insert('', END, values=i)
+
+
+    def b_sort_a(self, lis):
+        for j in range(len(lis) - 1):
+            for i in range(len(lis) - 1):
+                if lis[i] > lis[i + 1]:
+                    lis[i], lis[i + 1] = lis[i + 1], lis[i]
+        return lis
+
+    def b_sort_d(self, lis):
+        for j in range(len(lis) - 1):
+            for i in range(len(lis) - 1):
+                if lis[i] < lis[i + 1]:
+                    lis[i], lis[i + 1] = lis[i + 1], lis[i]
+        return lis
+
+    def linearsearch(self, lis, x):
+        for i in range(len(lis)):
+            if int(lis[i]) == int(x):
+                # print(lis[i])
+                return lis[i]
+        return False
+
+    def delete(self):
+        val = self.dep_tree.focus()
+        val_items = self.dep_tree.item(val)
+        values = val_items['values']
+        delete = values[0]
+        if delete >= 1:
+            query = "delete from department where id = %s"
+            values = (delete,)
+            self.db.delete(query, values)
+            messagebox.showinfo("Success", "Data delete successfully")
+            self.viewall()
+
+        else:
+            messagebox.showerror("error", "There is some error deleting the record")
+
+    def back(self):
+        w = Tk()
+        Frontend.welcome.Welcome(w)
+        self.w.withdraw()
+
 
 
 
