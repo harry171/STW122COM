@@ -296,6 +296,33 @@ class ViewDepartment:
         self.w.withdraw()
 
 
+class UpdateDepartment(RegisterDepartment):
+    def __init__(self, w):
+        super().__init__(w)
+        self.data = ViewDepartment.data[0]
+        self.dep_code_entry.insert(0, self.data[1])
+        self.dep_name_entry.insert(0, self.data[2])
+        self.heading_label.configure(text="Department Update Form")
+        self.heading_label.place(x=300, y=5)
+        self.reg_btn.configure(text="UPDATE")
+        self.reg_btn.configure(command=self.update)
+        self.back_btn.configure(command=self.back)
+
+    def back(self):
+        w = Tk()
+        ViewDepartment(w)
+        self.w.withdraw()
+
+    def update(self):
+        try:
+            query = "update department set dep_code = %s , name = %s where id = %s"
+            values = (self.dep_code_entry.get(), self.dep_name_entry.get(), self.data[0])
+            self.db.update(query, values)
+
+            messagebox.showinfo("Success", f"Department ID  {self.data[0]} Updated Successfully")
+
+        except BaseException as err:
+            messagebox.showerror("error", f"{err}")
 
 
 def w():
