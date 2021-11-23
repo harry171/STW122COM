@@ -369,9 +369,72 @@ class ViewEmployee:
                     lis[i], lis[i + 1] = lis[i + 1], lis[i]
         return lis
 
+    def update(self):
+        val = self.emp_tree.focus()
+        val_items = self.emp_tree.item(val)
+        values = val_items['values']
+        ViewEmployee.data.clear()
+        ViewEmployee.data.append(values)
+
+        w = Tk()
+        UpdateEmployee(w)
+        self.w.withdraw()
+
+    def search(self):
+        pass
+
+    def delete(self):
+        val = self.emp_tree.focus()
+        val_items = self.emp_tree.item(val)
+        values = val_items['values']
+        delete = values[0]
+        if delete >= 1:
+            query = "delete from employee where id = %s"
+            values = (delete,)
+            self.db.delete(query, values)
+            messagebox.showinfo("Success", "Data delete successfully")
+            self.viewall()
+
+        else:
+            messagebox.showerror("error", "There is some error deleting the record")
+
+    def back(self):
+        w = Tk()
+        Frontend.welcome.Welcome(w)
+        self.w.withdraw()
 
 
+class UpdateEmployee(Register):
+    def __init__(self, w):
+        super().__init__(w)
+        self.data = ViewEmployee.data[0]
+        self.full_name_entry.insert(0, self.data[1])
+        self.email_entry.insert(0, self.data[2])
+        self.d_o_b_entry.delete(0, END)
+        self.d_o_b_entry.configure(fg="black")
+        self.d_o_b_entry.insert(0, self.data[3])
+        self.gender_entry.set(self.data[4])
+        self.address_entry.insert(0, self.data[5])
+        self.contact_entry.insert(0, self.data[6])
+        self.department_entry.set(self.data[7])
+        # self.password_entry.
+        self.heading_label.configure(text="Employee Update Form")
+        self.heading_label.place(x=300, y=5)
+        self.reg_btn.configure(text="UPDATE")
+        self.reg_btn.configure(command=self.test)
+        self.back_btn.configure(command=self.back)
 
+    def back(self):
+        w = Tk()
+        ViewEmployee(w)
+        self.w.withdraw()
+
+    def test(self):
+        if self.username_entry.get() != "" or self.password_entry.get() != "" or self.c_password_entry.get() != "":
+            messagebox.showerror("Error", "You can not update Username and Password")
+
+        else:
+            self.update()
 
 
 def w():
