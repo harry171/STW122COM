@@ -436,6 +436,20 @@ class UpdateEmployee(Register):
         else:
             self.update()
 
+    def update(self):
+        try:
+            query = "update employee set name = %s , email = %s, dob=%s,gender=%s,address = %s," \
+                    " contact = %s , department = %s where id = %s"
+            values = (
+                self.full_name_entry.get(), self.email_entry.get(), self.d_o_b_entry.get(), self.gender_entry.get(),
+                self.address_entry.get(), self.contact_entry.get(), self.department_entry.get(), self.data[0])
+            self.db.update(query, values)
+
+            messagebox.showinfo("Success", f"Employee ID  {self.data[0]} Updated Successfully")
+
+        except BaseException as err:
+            messagebox.showerror("error", f"{err}")
+
 
 def w():
     w = Tk()
